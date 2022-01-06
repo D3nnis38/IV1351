@@ -13,7 +13,7 @@ import java.util.Properties;
  **/
 public class SgDAO {
     private Connection connection;
-    private final String databaseUrl = "jdbc:postgresql://localhost:5433/soundgood";
+    private final String DATABASE_URL = "jdbc:postgresql://localhost:5433/soundgood";
 
     private PreparedStatement getInstruments;
 
@@ -28,7 +28,7 @@ public class SgDAO {
     private void connect() throws SQLException {
         Properties properties = new Properties();
         properties.setProperty("user", "postgres");
-        connection = DriverManager.getConnection(databaseUrl, properties);
+        connection = DriverManager.getConnection(DATABASE_URL, properties);
         connection.setAutoCommit(false);
         prepareStatements();
     }
@@ -40,8 +40,6 @@ public class SgDAO {
             res = getInstruments.executeQuery();
             ArrayList<Instrument> i = new ArrayList<Instrument>();
             while (res.next()) {
-            System.out.println(res.getString("brand"));
-                System.out.println(res.toString());
                 i.add(new Instrument(
                         res.getString("instrument_id"),
                         res.getString("instrument"),

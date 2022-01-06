@@ -19,4 +19,13 @@ public class Instrument {
         this.price = price;
         this.isRented = isRented;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "instrument='" + instrument + '\'' +
+                ", brand='" + brand + '\'' +
+                ", price=" + price +
+                " SEK}";
+    }
 }

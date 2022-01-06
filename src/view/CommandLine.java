@@ -2,7 +2,6 @@ package view;
 
 import controller.Controller;
 import model.Instrument;
-import model.InstrumentRental;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -18,30 +17,35 @@ public class CommandLine {
     private Commands commands;
     private boolean running = true;
 
-    public CommandLine(Controller c){
+    public CommandLine(Controller c) {
         this.controller = c;
         commands = new Commands();
         runTime();
     }
 
-    public void runTime(){
-        while(running){
-            try{
+    public void runTime() {
+        while (running) {
+            try {
                 commands.listCommands();
-                switch(commands.input(scan.nextLine())){
+                switch (commands.input(scan.nextLine())) {
                     case "li":
                         String type = commands.getType();
                         ArrayList<? extends Instrument> instruments = controller.listInstrumentRental(type);
-                        if(instruments.size() > 0){
-                            for(Instrument instrument : instruments){
+                        if (instruments.size() > 0) {
+                            for (Instrument instrument : instruments) {
                                 System.out.println(instrument);
                             }
+                        } else {
+                            System.out.println("Could not find any of those instruments");
                         }
                         break;
+                    case "exit":
+                        running = false;
+                        System.out.println("Exiting program...");
                     default:
                         System.out.println("User inputted unknown command...");
                 }
-            } catch(Exception e){
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }

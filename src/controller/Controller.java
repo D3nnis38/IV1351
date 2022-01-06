@@ -19,11 +19,11 @@ public class Controller {
     }
 
     public ArrayList<? extends Instrument> listInstrumentRental(String type) throws InstrumentException {
-        if(type == null) throw new InstrumentException("Query for listInstrumentRental with type " + type);
+        if(type == null) throw new InstrumentException("Query for listInstrumentRental with type " + type + " is unsuccessful");
         try{
             return sgDAO.getInstruments(type);
         }catch(SgDBException e){
-            throw new InstrumentException("Query for listInstrumentRental with type " + type);
+            throw new InstrumentException("Query for listInstrumentRental with type: " + type + " is unsuccessful");
         }
     }
 }
