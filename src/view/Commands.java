@@ -25,6 +25,7 @@ public class Commands {
     }
 
     public String getType(){
+        if(this.command.length < 1) return null;
         return this.command[1];
     }
 }
