@@ -92,7 +92,7 @@ public class SgDAO {
     public void terminateRental(String instrumentId) throws SgDBException {
         try {
             removeRentalForStudent.setString(1, instrumentId);
-            int rUpdate = removeRentalForStudent.executeUpdate();
+            removeRentalForStudent.executeUpdate();
             connection.commit();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -100,9 +100,13 @@ public class SgDAO {
     }
 
     public void addRentalToArchive(String instrumentId) throws SgDBException{
-//        try{
-//
-//        }
+        try{
+            insertRentalToArchive.setString(1, instrumentId);
+            insertRentalToArchive.execute();
+            connection.commit();
+        } catch (SQLException throwables){
+            throwables.printStackTrace();
+        }
     }
 
     private void prepareStatements() throws SQLException {
@@ -111,15 +115,30 @@ public class SgDAO {
         );
 
         getNumberOfActiveRentsbyStudent = connection.prepareStatement(
-                "SELECT COUNT(*) AS amount FROM instrument_rental WHERE school_id = ? AND is_rented = TRUE;"
+                "SELECT COUNT(*) AS amount FROM instrument_rental WHERE student_id = ? AND is_rented = TRUE;"
         );
 
         addRentalForStundent = connection.prepareStatement(
-                "WITH  rented  as (" +
+                "WITH  rented  AS (" +
                         "UPDATE instrument_rental " +
-                        "SET is_rented = TRUE, school_id = ?, start_date = CURRENT_DATE, end_date = CURRENT_DATE + INTERVAL '1 year' " +
-                        "WHERE instrument_id = ? returning * ) " +
+                        "SET is_rented = TRUE, student_id = ?, start_date = CURRENT_DATE, end_date = CURRENT_DATE + INTERVAL '1 year' " +
+                        "WHERE instrument_id = ? RETURNING * ) " +
                         "UPDATE instruments SET is_rented = TRUE " +
+                        "WHERE instrument_id IN (SELECT instrument_id FROM rented);"
+        );
+
+        insertRentalToArchive = connection.prepareStatement(
+                "INSERT INTO rental_archive (instrument_id, instrument, brand , price, student_id, start_date, end_date) " +
+                        "SELECT instrument_id, instrument, brand , price, student_id , start_date, CURRENT_DATE " +
+                        "FROM instrument_rental WHERE instrument_id = ?;"
+        );
+
+        removeRentalForStudent = connection.prepareStatement(
+                "WITH  rented  AS ( " +
+                        "UPDATE instrument_rental " +
+                        "SET is_rented = FALSE, end_date = CURRENT_DATE, student_id = null " +
+                        "WHERE instrument_id = ? RETURNING * ) " +
+                        "UPDATE instruments SET is_rented = FALSE " +
                         "WHERE instrument_id IN (SELECT instrument_id FROM rented);"
         );
     }

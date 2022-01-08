@@ -24,12 +24,13 @@ public class CommandLine {
     }
 
     public void runTime() {
+        String instrumentId, studentId,type;
         while (running) {
             try {
-                commands.listCommands();
+                System.out.println(commands.listCommands());
                 switch (commands.input(scan.nextLine())) {
                     case "li":
-                        String type = commands.getArgument(1);
+                        type = commands.getArgument(1);
                         ArrayList<? extends Instrument> instruments = controller.listInstrumentRental(type);
                         if (instruments.size() > 0) {
                             for (Instrument instrument : instruments) {
@@ -40,8 +41,8 @@ public class CommandLine {
                         }
                         break;
                     case "rent":
-                        String studentId = commands.getArgument(1);
-                        String instrumentId = commands.getArgument(2);
+                        studentId = commands.getArgument(1);
+                        instrumentId = commands.getArgument(2);
                         int amountRented = controller.checkRentPossibility(studentId);
                         if (amountRented < 2) {
                             System.out.println("\nThe student has " + amountRented + " rented and is eligable to rent the desired item. Proceed? (y/n)");
@@ -64,11 +65,18 @@ public class CommandLine {
                         } else
                             System.out.println("This student already has " + amountRented + " instruments rented...");
                         break;
+                    case "terminate":
+                        instrumentId = commands.getArgument(1);
+                        controller.terminateRental(instrumentId);
+                        System.out.println("Successfully terminated rental for: " + instrumentId);
+                        break;
                     case "exit":
                         running = false;
                         System.out.println("Exiting program...");
+                        break;
                     default:
                         System.out.println("User inputted unknown command...");
+                        break;
                 }
             } catch (Exception e) {
                 System.out.println(e.getMessage());

@@ -50,4 +50,15 @@ public class Controller {
             throw new InstrumentException("Did not manage to update database");
         }
     }
+
+    public void terminateRental(String instrumentId) throws InstrumentException{
+        final String baseError = "Could not terminate rental, ";
+        if(instrumentId == null) throw new InstrumentException(baseError + "instrumentId was 'null'");
+        try{
+            sgDAO.addRentalToArchive(instrumentId);
+            sgDAO.terminateRental(instrumentId);
+        } catch(SgDBException e){
+            throw new InstrumentException("Did not manage to update database");
+        }
+    }
 }
