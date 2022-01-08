@@ -29,7 +29,7 @@ public class CommandLine {
                 commands.listCommands();
                 switch (commands.input(scan.nextLine())) {
                     case "li":
-                        String type = commands.getType();
+                        String type = commands.getArgument(1);
                         ArrayList<? extends Instrument> instruments = controller.listInstrumentRental(type);
                         if (instruments.size() > 0) {
                             for (Instrument instrument : instruments) {
@@ -38,6 +38,31 @@ public class CommandLine {
                         } else {
                             System.out.println("Could not find any of those instruments");
                         }
+                        break;
+                    case "rent":
+                        String studentId = commands.getArgument(1);
+                        String instrumentId = commands.getArgument(2);
+                        int amountRented = controller.checkRentPossibility(studentId);
+                        if (amountRented < 2) {
+                            System.out.println("\nThe student has " + amountRented + " rented and is eligable to rent the desired item. Proceed? (y/n)");
+                            boolean subRun = true;
+                            while (subRun) {
+                                switch (scan.nextLine()) {
+                                    case "y":
+                                        controller.rentInstrument(studentId, instrumentId);
+                                        System.out.println("student: " + studentId + "\nis now renting instrument: " + instrumentId + "\n");
+                                        subRun = false;
+                                        break;
+                                    case "n":
+                                        subRun = false;
+                                        break;
+                                    default:
+                                        System.out.println("Unknown command...");
+                                        break;
+                                }
+                            }
+                        } else
+                            System.out.println("This student already has " + amountRented + " instruments rented...");
                         break;
                     case "exit":
                         running = false;

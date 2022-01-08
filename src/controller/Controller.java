@@ -26,13 +26,28 @@ public class Controller {
         try {
             return sgDAO.getInstruments(type);
         } catch (SgDBException e) {
-            throw new InstrumentException(baseError);
+            throw new InstrumentException("Did not manage to update database");
         }
     }
 
-    public void rentInstrument(String instrumentRentalId, String studentId) throws Exception {
-        final String baseError = "Could not rent instrument,";
-        if (instrumentRentalId == null) throw new InstrumentException(baseError + " instrumentId was 'null'");
-        if (studentId == null) throw new InstrumentException(baseError + " studentId was 'null'");
+    public int checkRentPossibility(String studentId) throws Exception {
+        final String baseError = "Could not check availability for student,";
+        if (studentId == null) throw new Exception(baseError + " studentId was 'null'");
+        try {
+            return sgDAO.countRentals(studentId);
+        } catch (SgDBException e) {
+            throw new Exception("Was not able to fetch data from databse", e);
+        }
+    }
+
+    public void rentInstrument(String studentId, String instrumentId) throws InstrumentException {
+        final String baseError = "Could not rent instrument, ";
+        if (studentId == null) throw new InstrumentException(baseError + "studentId was 'null'");
+        if (instrumentId == null) throw new InstrumentException(baseError + "instrumentId was 'null'");
+        try {
+            sgDAO.rentInstrument(studentId, instrumentId);
+        } catch (SgDBException e) {
+            throw new InstrumentException("Did not manage to update database");
+        }
     }
 }

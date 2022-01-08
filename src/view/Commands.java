@@ -13,9 +13,9 @@ public class Commands {
 
     public void listCommands() {
         System.out.println("1. li <type> (List instruments with specific type)");
-        System.out.println("2. ...");
+        System.out.println("2. rent <studentId> <instrumentId> (rent instrument with id to student with id)");
         System.out.println("3. ...");
-        System.out.println("4. Exit");
+        System.out.println("4. exit");
 
     }
 
@@ -24,8 +24,8 @@ public class Commands {
         return this.command[0];
     }
 
-    public String getType(){
-        if(this.command.length < 1) return null;
-        return this.command[1];
+    public String getArgument(int arg){
+        if(this.command.length < arg) return null;
+        return this.command[arg];
     }
 }

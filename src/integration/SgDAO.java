@@ -1,5 +1,6 @@
 package integration;
 
+import com.mysql.cj.x.protobuf.MysqlxPrepare;
 import model.Instrument;
 
 import java.sql.*;
@@ -16,6 +17,10 @@ public class SgDAO {
     private final String DATABASE_URL = "jdbc:postgresql://localhost:5433/soundgood";
 
     private PreparedStatement getInstruments;
+    private PreparedStatement getNumberOfActiveRentsbyStudent;
+    private PreparedStatement addRentalForStundent;
+    private PreparedStatement removeRentalForStudent;
+    private PreparedStatement insertRentalToArchive;
 
     public SgDAO() throws SgDBException {
         try {
@@ -56,9 +61,66 @@ public class SgDAO {
         return null;
     }
 
+    public int countRentals(String studentId) throws SgDBException {
+        ResultSet res = null;
+        try {
+            getNumberOfActiveRentsbyStudent.setString(1, studentId);
+            res = getNumberOfActiveRentsbyStudent.executeQuery();
+            int count = 0;
+            while (res.next()) {
+                count = res.getInt("amount");
+            }
+            connection.commit();
+            return count;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return 0;
+    }
+
+    public void rentInstrument(String studentId, String instrumentId) throws SgDBException {
+        try {
+            addRentalForStundent.setString(1, studentId);
+            addRentalForStundent.setString(2, instrumentId);
+            addRentalForStundent.executeUpdate();
+            connection.commit();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public void terminateRental(String instrumentId) throws SgDBException {
+        try {
+            removeRentalForStudent.setString(1, instrumentId);
+            int rUpdate = removeRentalForStudent.executeUpdate();
+            connection.commit();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public void addRentalToArchive(String instrumentId) throws SgDBException{
+//        try{
+//
+//        }
+    }
+
     private void prepareStatements() throws SQLException {
         getInstruments = connection.prepareStatement(
-                "SELECT * FROM instruments WHERE instrument = ? AND is_rented = FALSE"
+                "SELECT * FROM instruments WHERE instrument = ? AND is_rented = FALSE;"
+        );
+
+        getNumberOfActiveRentsbyStudent = connection.prepareStatement(
+                "SELECT COUNT(*) AS amount FROM instrument_rental WHERE school_id = ? AND is_rented = TRUE;"
+        );
+
+        addRentalForStundent = connection.prepareStatement(
+                "WITH  rented  as (" +
+                        "UPDATE instrument_rental " +
+                        "SET is_rented = TRUE, school_id = ?, start_date = CURRENT_DATE, end_date = CURRENT_DATE + INTERVAL '1 year' " +
+                        "WHERE instrument_id = ? returning * ) " +
+                        "UPDATE instruments SET is_rented = TRUE " +
+                        "WHERE instrument_id IN (SELECT instrument_id FROM rented);"
         );
     }
 }
