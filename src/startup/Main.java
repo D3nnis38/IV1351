@@ -1,3 +1,5 @@
+package startup;
+
 import controller.Controller;
 import integration.SgDBException;
 import view.CommandLine;
