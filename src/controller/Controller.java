@@ -19,7 +19,7 @@ public class Controller {
         sgDAO = new SgDAO();
     }
 
-    public ArrayList<? extends Instrument> listInstrumentRental(String type) throws InstrumentException {
+    public ArrayList<Instrument> listInstrumentRental(String type) throws InstrumentException {
         final String baseError = "Query for listInstrumentRental with type " + type + " is unsuccessful";
         if (type == null)
             throw new InstrumentException(baseError);

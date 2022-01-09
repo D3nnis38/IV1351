@@ -31,7 +31,7 @@ public class CommandLine {
                 switch (commands.input(scan.nextLine())) {
                     case "li":
                         type = commands.getArgument(1);
-                        ArrayList<? extends Instrument> instruments = controller.listInstrumentRental(type);
+                        ArrayList<Instrument> instruments = controller.listInstrumentRental(type);
                         if (instruments.size() > 0) {
                             for (Instrument instrument : instruments) {
                                 System.out.println(instrument);
