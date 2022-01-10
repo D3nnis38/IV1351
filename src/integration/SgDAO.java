@@ -1,6 +1,5 @@
 package integration;
 
-import com.mysql.cj.x.protobuf.MysqlxPrepare;
 import model.Instrument;
 
 import java.sql.*;
@@ -56,7 +55,7 @@ public class SgDAO {
             connection.commit();
             return i;
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            handleDatabaseException("Could not fetch instrument", throwables);
         }
         return null;
     }
@@ -73,7 +72,7 @@ public class SgDAO {
             connection.commit();
             return count;
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            handleDatabaseException("Could not count rentals", throwables);
         }
         return 0;
     }
@@ -85,7 +84,7 @@ public class SgDAO {
             addRentalForStundent.executeUpdate();
             connection.commit();
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            handleDatabaseException("Could not rent instrument", throwables);
         }
     }
 
@@ -95,19 +94,20 @@ public class SgDAO {
             removeRentalForStudent.executeUpdate();
             connection.commit();
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            handleDatabaseException("Could not terminate rental", throwables);
         }
     }
 
-    public void addRentalToArchive(String instrumentId) throws SgDBException{
-        try{
+    public void addRentalToArchive(String instrumentId) throws SgDBException {
+        try {
             insertRentalToArchive.setString(1, instrumentId);
             insertRentalToArchive.execute();
             connection.commit();
-        } catch (SQLException throwables){
-            throwables.printStackTrace();
+        } catch (SQLException throwables) {
+            handleDatabaseException("Could not add rental to archive", throwables);
         }
     }
+
 
     private void prepareStatements() throws SQLException {
         getInstruments = connection.prepareStatement(
@@ -142,4 +142,15 @@ public class SgDAO {
                         "WHERE instrument_id IN (SELECT instrument_id FROM rented);"
         );
     }
+
+    public void handleDatabaseException(String message, Exception e) throws SgDBException {
+        try {
+            connection.rollback();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        if (e != null) throw new SgDBException(message, e);
+        else throw new SgDBException(message);
+    }
+
 }
